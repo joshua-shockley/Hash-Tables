@@ -21,7 +21,7 @@ class HashTable:
         self.storage = [None] * capacity
 
         # add length for assitance in resize...
-        self.length = 0
+        # self.length = 0
 
     def _hash(self, key):
         '''
@@ -68,9 +68,10 @@ class HashTable:
                     kv[1] = value
                     break
 
-        self.storage[index] = value
-        self.length += 1
-        print("length has changed upon insert:", self.length)
+        self.storage[index] = []
+        self.storage[index].append([key, value])
+        # self.length += 1
+        # print("length has changed upon insert:", self.length)
         print(
             f"added value:{value} to key:{key} and key hashed to index:{index}")
         return
@@ -94,7 +95,13 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        if self.storage[index] is None:
+            return None
+        else:
+            for kv in self.storage[index]:
+                if kv[0] == key:
+                    return kv[1]
 
     def resize(self):
         '''
@@ -106,14 +113,20 @@ class HashTable:
         '''
         # code from dynamic array.... what needs to be different to work for hashtable
         # need to also hash the key/value pairs
-        self.capacity *= 2
-        print("just changed capacity in fn resize() to:", self.capacity)
-        new_storage = [None] * self.capacity
+        # self.capacity *= 2
+        # MAKES A NEW HASTABLE WHICH GRABS NEW MEMORY SLOT
+        new_storage = HashTable(capacity=self.capacity*2)
+        # NOW VERIFY THAT None IS THE VALUE IN STORAGE
+        for i in self.storage:
+            if self.storage[i] is None:
+                continue
+
         # use key, value in self.storage.items()?
-        # for i in range(self.length):
-        #     new_storage[i] = self.storage[i]
+            for kv in self.storage[i]:
+                new_storage.insert(kv[0], kv[1])
         self.storage = new_storage
-        pass
+        print("just changed capacity in fn resize() to:", self.capacity)
+        return
 
 
 if __name__ == "__main__":
