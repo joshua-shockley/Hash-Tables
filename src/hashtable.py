@@ -59,22 +59,38 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        print("the index made from hash_mod():", index)
         if self.storage[index] is not None:
-            for kv in self.storage[index]:
-                # if key is found, then update
-                # its current value to new value
-                if kv[0] == key:
-                    kv[1] = value
-                    break
+            print("collision motha lova! @ key: " +
+                  self.storage[index].key + " value: " + self.storage[index].value)
+            print(f" would currently replace with key: {key} value: {value}")
+            if key != self.storage[index].key:
+                old_head = self.storage[index]
+                # if self.storage[index].next is None:
+                self.storage[index] = LinkedPair(key, value)
+                self.storage[index].next = old_head
+                # print(
+                #     f"old head key: {old_head.key}, old head value: {old_head.value}")
+                # print(
+                #     f"new head key: {self.storage[index].key}, new head value: {self.storage[index].value}")
+                print(
+                    f"head: ({self.storage[index].key}, {self.storage[index].value}) -> head.next: ({self.storage[index].next.key}, {self.storage[index].next.value})")
+                return
+        self.storage[index] = LinkedPair(key, value)
+        # my code from example i found for some help
+        # print("the index made from hash_mod():", index)
+        # if self.storage[index] is not None:
+        #     for kv in self.storage[index]:
+        #         # if key is found, then update
+        #         # its current value to new value
+        #         if kv[0] == key:
+        #             kv[1] = value
+        #             break
 
-        self.storage[index] = []
-        self.storage[index].append([key, value])
-        # self.length += 1
-        # print("length has changed upon insert:", self.length)
-        print(
-            f"added value:{value} to key:{key} and key hashed to index:{index}")
-        return
+        # self.storage[index] = []
+        # self.storage[index].append([key, value])
+        # print(
+        #     f"added value:{value} to key:{key} and key hashed to index:{index}")
+        # return
 
     def remove(self, key):
         '''
@@ -84,8 +100,10 @@ class HashTable:
 
         Fill this in.
         '''
-
-        pass
+        index = self._hash_mod(key)
+        if self.storage[index] is None:
+            return None
+        self.storage[index] = None
 
     def retrieve(self, key):
         '''
@@ -95,38 +113,44 @@ class HashTable:
 
         Fill this in.
         '''
+        # get index just like in insert
         index = self._hash_mod(key)
-        if self.storage[index] is None:
-            return None
-        else:
-            for kv in self.storage[index]:
-                if kv[0] == key:
-                    return kv[1]
+        # return self.storage[index].value
+        current = self.storage[index]
+        while current is not None:
+            if current.key == key:
+                # return self.storage[index].value
+                return current.value
+            else:
+                current = current.next
+
+        return None
 
     def resize(self):
         '''
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
 
-
         Fill this in.
         '''
-        # code from dynamic array.... what needs to be different to work for hashtable
-        # need to also hash the key/value pairs
-        # self.capacity *= 2
-        # MAKES A NEW HASTABLE WHICH GRABS NEW MEMORY SLOT
-        new_storage = HashTable(capacity=self.capacity*2)
-        # NOW VERIFY THAT None IS THE VALUE IN STORAGE
-        for i in self.storage:
-            if self.storage[i] is None:
-                continue
-
-        # use key, value in self.storage.items()?
-            for kv in self.storage[i]:
-                new_storage.insert(kv[0], kv[1])
-        self.storage = new_storage
-        print("just changed capacity in fn resize() to:", self.capacity)
-        return
+        # create new array with size *2
+        # use temp variable to store old storage info before messing with capacity
+        old_storage = self.storage
+        self.capacity *= 2
+        # make the array new with new capacity
+        self.storage = [None] * self.capacity
+        # move the value over
+        for pair in old_storage:
+            if pair is not None:
+                # figure out proper new place for k/v
+                # re-insert key/value
+                # self.insert(pair.key, pair.value)
+                current = pair
+                # this is where we look through the LL created and
+                while current != None:
+                    self.insert(current.key, current.value)
+                    current = current.next
+            # return None
 
 
 if __name__ == "__main__":
